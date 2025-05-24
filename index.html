@@ -1192,24 +1192,22 @@ function addVideoStream(videoEl, userId, userName) {
       // ======================
 // ROOM SHARING INTEGRATION
 // ======================
-
-// Add these at the top with other variables
+// Room sharing variables
 let roomPassword = '';
 let currentRoom = null;
 
-// Modified roomJoined handler to include sharing setup
+// Room joined handler
 socket.on('roomJoined', (room) => {
   currentRoom = room;
   setupRoomSharing(room);
   
-  // Your existing room joined logic
+  // Handle participants
   room.participants.forEach(participant => {
     if (participant.id !== socket.id) {
       createVideoElement(participant.stream, participant.username);
     }
   });
   
-  // Start local video
   startLocalStream();
 });
 
@@ -1217,25 +1215,29 @@ socket.on('roomJoined', (room) => {
 function setupRoomSharing(room) {
   const isPrivate = room.isPrivate;
   
-  // Show appropriate UI
-  document.getElementById('public-share-section').style.display = isPrivate ? 'none' : 'block';
-  document.getElementById('private-share-section').style.display = isPrivate ? 'block' : 'none';
+  // Toggle UI based on room type
+  document.getElementById('public-share-section').style.display = 
+    isPrivate ? 'none' : 'block';
+  document.getElementById('private-share-section').style.display = 
+    isPrivate ? 'block' : 'none';
   
-  // Generate public link
+  // Generate and display link
   document.getElementById('roomLink').value = generateRoomLink(room.id);
 }
 
-// Generate room link (public or private)
+// Generate room link
 function generateRoomLink(roomId, includePassword = false) {
   const baseUrl = window.location.origin + window.location.pathname;
   let link = `${baseUrl}?room=${encodeURIComponent(roomId)}`;
+  
   if (includePassword && roomPassword) {
     link += `&pwd=${encodeURIComponent(roomPassword)}`;
   }
+  
   return link;
 }
 
-// Copy link handler
+// Copy link functionality
 function copyLink() {
   const linkInput = document.getElementById('roomLink');
   linkInput.select();
@@ -1248,7 +1250,7 @@ function copyLink() {
   showNotification('Room link copied to clipboard!');
 }
 
-// Share link handler
+// Share link functionality
 function shareLink() {
   const link = document.getElementById('roomLink').value;
   
@@ -1257,17 +1259,20 @@ function shareLink() {
       title: 'Join my study room',
       text: 'Let\'s study together!',
       url: link
-    }).catch(err => {
-      console.log('Share failed:', err);
-    });
+    }).catch(console.error);
   } else {
     window.open(
-      `mailto:?subject=Join my study room&body=Click this link to join: ${link}`,
+      `mailto:?subject=Join my study room&body=Join here: ${link}`,
       '_blank'
     );
   }
 }
 
+// Event listeners (should be placed after DOM is loaded)
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('copyLinkBtn').addEventListener('click', copyLink);
+  document.getElementById('shareBtn').addEventListener('click', shareLink);
+});
 // Set password for private rooms
 function setPassword() {
   roomPassword = document.getElementById('roomPassword').value.trim();
