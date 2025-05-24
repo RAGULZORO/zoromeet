@@ -527,6 +527,28 @@
         <h1 id="roomTitle">Virtual Study Room</h1>
         <button id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
       </div>
+      <!-- Add this card near your other cards (video, chat, etc.) -->
+<div class="card" id="share-card">
+  <h2>Invite Friends</h2>
+  <div id="share-controls">
+    <!-- Public Room UI -->
+    <div id="public-share-section">
+      <input type="text" id="roomLink" readonly class="link-input">
+      <button id="copyLinkBtn" class="primary"><i class="fas fa-copy"></i> Copy</button>
+      <button id="shareBtn" class="success"><i class="fas fa-share-alt"></i> Share</button>
+    </div>
+    
+    <!-- Private Room UI (initially hidden) -->
+    <div id="private-share-section" style="display:none;">
+      <input type="password" id="roomPassword" placeholder="Set room password">
+      <button id="setPasswordBtn" class="primary">Lock Room</button>
+      <div id="private-link-container" style="display:none; margin-top:10px;">
+        <input type="text" id="privateRoomLink" readonly class="link-input">
+        <button id="copyPrivateLinkBtn" class="primary"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+    </div>
+  </div>
+</div>
       <div class="main-content">
         <div id="video-section">
           <div id="video-grid"></div>
@@ -557,7 +579,22 @@
   </div>
 
   <script>
-    
+    // Add this to your initialization code
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('room');
+  const password = urlParams.get('pwd');
+
+  if (roomId && currentUser) {
+    if (password) {
+      // Private room join
+      socket.emit('joinRoom', { roomId, password });
+    } else {
+      // Public room join
+      socket.emit('joinRoom', { roomId });
+    }
+  }
+});
     // Check if user is logged in
     const loggedInUser = localStorage.getItem("loggedInUser");
     if (!loggedInUser) {
@@ -957,7 +994,92 @@ function addVideoStream(videoEl, userId, userName) {
       peer.signal(incomingSignal);
 
       return peer;
-    }
+    }// ======================
+// ROOM SHARING LOGIC
+// ======================
+
+// Add these variables at the top with other app state variables
+let roomPassword = '';
+
+// Call this when a room is successfully joined
+function setupRoomSharing(room) {
+  const isPrivate = room.isPrivate;
+  
+  // Show appropriate UI
+  document.getElementById('public-share-section').style.display = isPrivate ? 'none' : 'block';
+  document.getElementById('private-share-section').style.display = isPrivate ? 'block' : 'none';
+  
+  // Generate public link
+  document.getElementById('roomLink').value = generateRoomLink(room.id);
+  
+  // Set up event listeners (add this near your other event listeners)
+  document.getElementById('copyLinkBtn').addEventListener('click', copyLink);
+  document.getElementById('shareBtn').addEventListener('click', shareLink);
+  document.getElementById('setPasswordBtn').addEventListener('click', setPassword);
+  document.getElementById('copyPrivateLinkBtn').addEventListener('click', copyPrivateLink);
+}
+
+// Add these functions with your other utility functions
+function generateRoomLink(roomId, includePassword = false) {
+  const baseUrl = window.location.href.split('?')[0];
+  let link = `${baseUrl}?room=${encodeURIComponent(roomId)}`;
+  if (includePassword && roomPassword) {
+    link += `&pwd=${encodeURIComponent(roomPassword)}`;
+  }
+  return link;
+}
+
+function copyLink() {
+  const linkInput = document.getElementById('roomLink');
+  linkInput.select();
+  document.execCommand('copy');
+  showNotification('Public link copied!');
+}
+
+function shareLink() {
+  const link = document.getElementById('roomLink').value;
+  if (navigator.share) {
+    navigator.share({
+      title: 'Join my study room',
+      text: 'Let\'s study together!',
+      url: link
+    });
+  } else {
+    // Fallback for desktop
+    window.open(`mailto:?subject=Join my study room&body=Join here: ${link}`);
+  }
+}
+
+function setPassword() {
+  roomPassword = document.getElementById('roomPassword').value.trim();
+  if (roomPassword.length < 4) {
+    showNotification('Password must be at least 4 characters');
+    return;
+  }
+  
+  socket.emit('setRoomPassword', {
+    roomId: currentRoom.id,
+    password: roomPassword
+  });
+  
+  // Show private link
+  document.getElementById('privateRoomLink').value = generateRoomLink(currentRoom.id, true);
+  document.getElementById('private-link-container').style.display = 'block';
+}
+
+function copyPrivateLink() {
+  const linkInput = document.getElementById('privateRoomLink');
+  linkInput.select();
+  document.execCommand('copy');
+  showNotification('Private link copied!');
+}
+
+// Add this to your existing 'roomJoined' handler
+socket.on('roomJoined', (room) => {
+  currentRoom = room;
+  setupRoomSharing(room); // Initialize sharing UI
+  // ... your existing room joined logic ...
+});
   </script>
 </body>
 </html>
