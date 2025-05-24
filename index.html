@@ -530,6 +530,20 @@
 .btn-success {
   background: #34a853;
   color: white;
+}/* Add to your styles */
+.copied {
+  border: 2px solid #4CAF50 !important;
+  background-color: #f0fff0 !important;
+}
+
+.link-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+#private-link-container {
+  margin-top: 15px;
 }
     }
   </style>
@@ -652,8 +666,29 @@
     </div>
   </div>
 
-  <script>
-    // Add this to your initialization code
+<script>
+    // UI Elements
+    const roomModal = document.getElementById("roomModal");
+    const mainContent = document.getElementById("mainContent");
+    const sidebar = document.getElementById("sidebar");
+    const roomTitle = document.getElementById("roomTitle");
+    const backBtn = document.getElementById("backBtn");
+
+    const videoGrid = document.getElementById("video-grid");
+    const chatDiv = document.getElementById("chat");
+    const participantsDiv = document.getElementById("participants");
+    const chatInput = document.getElementById("chatInput");
+    const sendChatBtn = document.getElementById("sendChatBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const videoBtn = document.getElementById("videoBtn");
+    const leaveBtn = document.getElementById("leaveBtn");
+
+    const toggleChatBtn = document.getElementById("toggleChat");
+    const toggleParticipantsBtn = document.getElementById("toggleParticipants");
+    const sidebarTabs = document.querySelectorAll(".sidebar-tab");
+    const sidebarContents = document.querySelectorAll(".sidebar-content .tab-content");
+
+        // Add this to your initialization code
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('room');
@@ -676,26 +711,112 @@ window.addEventListener('DOMContentLoaded', () => {
       window.location.href = "login.html";
     }
 
-    // UI Elements
-    const roomModal = document.getElementById("roomModal");
-    const mainContent = document.getElementById("mainContent");
-    const sidebar = document.getElementById("sidebar");
-    const roomTitle = document.getElementById("roomTitle");
-    const backBtn = document.getElementById("backBtn");
 
-    const videoGrid = document.getElementById("video-grid");
-    const chatDiv = document.getElementById("chat");
-    const participantsDiv = document.getElementById("participants");
-    const chatInput = document.getElementById("chatInput");
-    const sendChatBtn = document.getElementById("sendChatBtn");
-    const muteBtn = document.getElementById("muteBtn");
-    const videoBtn = document.getElementById("videoBtn");
-    const leaveBtn = document.getElementById("leaveBtn");
+let currentUser = prompt("Enter your name"); // Or auto-generate
 
-    const toggleChatBtn = document.getElementById("toggleChat");
-    const toggleParticipantsBtn = document.getElementById("toggleParticipants");
-    const sidebarTabs = document.querySelectorAll(".sidebar-tab");
-    const sidebarContents = document.querySelectorAll(".sidebar-content .tab-content");
+// === VIDEO SETUP ===
+
+function addVideoStream(video, stream) {
+  video.srcObject = stream;
+  video.addEventListener("loadedmetadata", () => {
+    video.play();
+  });
+  videoGrid.appendChild(video);
+}
+
+// === GENERATE ROOM LINK ===
+function generateRoomLink(roomId) {
+  const currentUrl = window.location.origin + window.location.pathname;
+  return `${currentUrl}?room=${encodeURIComponent(roomId)}`;
+}
+
+// === JOIN ROOM LOGIC ===
+function joinRoom(roomId) {
+  socket.emit('joinRoom', { roomId });
+
+  // Setup user media
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      localStream = stream;
+      const myVideo = document.createElement("video");
+      myVideo.muted = true;
+      addVideoStream(myVideo, stream);
+
+      // Let others know you're here
+      socket.on("user-connected", (userId) => {
+        // Send your stream to the new user
+        const call = peer.call(userId, stream);
+        const video = document.createElement("video");
+        call.on("stream", remoteStream => {
+          addVideoStream(video, remoteStream);
+        });
+      });
+
+      // Answer calls
+      peer.on("call", call => {
+        call.answer(stream);
+        const video = document.createElement("video");
+        call.on("stream", remoteStream => {
+          addVideoStream(video, remoteStream);
+        });
+      });
+    });
+}
+
+// === ROOM JOINED RESPONSE ===
+socket.on('roomJoined', (room) => {
+  const roomLink = generateRoomLink(room.id);
+  document.getElementById('roomLink').value = roomLink;
+  joinRoom(room.id);
+});
+
+// === COPY BUTTON ===
+document.getElementById('copyLinkBtn').addEventListener('click', () => {
+  const roomLink = document.getElementById('roomLink');
+  roomLink.select();
+  document.execCommand('copy');
+  showNotification('Link copied to clipboard!');
+});
+
+// === SHARE BUTTON ===
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const roomLink = document.getElementById('roomLink').value;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Join my study room',
+      text: 'Let\'s study together!',
+      url: roomLink
+    }).catch(err => console.log('Share failed:', err));
+  } else {
+    window.open(
+      `mailto:?subject=Join my study room&body=Click this link to join: ${roomLink}`,
+      '_blank'
+    );
+  }
+});
+
+// === AUTO-JOIN IF LINK HAS ?room=ROOMID ===
+window.addEventListener('load', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('room');
+
+  if (roomId && currentUser) {
+    socket.emit('joinRoom', { roomId });
+  }
+});
+
+// === PEERJS SETUP === (You must include PeerJS CDN or npm)
+const peer = new Peer(undefined, {
+  host: "your-peerjs-server.com", // Or use peerjs free cloud for testing
+  port: 443,
+  secure: true
+});
+
+peer.on("open", id => {
+  console.log("My peer ID is:", id);
+  // You can use this ID if needed
+});
 
     // Sidebar Toggle for Chat/Participants
     function toggleSidebar(tab) {
@@ -1068,132 +1189,142 @@ function addVideoStream(videoEl, userId, userName) {
       peer.signal(incomingSignal);
 
       return peer;
-    }// ======================
-// ROOM SHARING LOGIC
+      // ======================
+// ROOM SHARING INTEGRATION
 // ======================
 
-// Add these variables at the top with other app state variables
-// Generate the room link
-function generateRoomLink(roomId) {
-  const currentUrl = window.location.origin + window.location.pathname;
-  return `${currentUrl}?room=${encodeURIComponent(roomId)}`;
-}
+// Add these at the top with other variables
+let roomPassword = '';
+let currentRoom = null;
 
-// Update when room is joined
+// Modified roomJoined handler to include sharing setup
 socket.on('roomJoined', (room) => {
-  const roomLink = generateRoomLink(room.id);
-  document.getElementById('roomLink').value = roomLink;
+  currentRoom = room;
+  setupRoomSharing(room);
+  
+  // Your existing room joined logic
+  room.participants.forEach(participant => {
+    if (participant.id !== socket.id) {
+      createVideoElement(participant.stream, participant.username);
+    }
+  });
+  
+  // Start local video
+  startLocalStream();
 });
 
-// Copy Link Functionality
-document.getElementById('copyLinkBtn').addEventListener('click', () => {
-  const roomLink = document.getElementById('roomLink');
+// Initialize sharing UI
+function setupRoomSharing(room) {
+  const isPrivate = room.isPrivate;
   
-  // Select and copy
-  roomLink.select();
+  // Show appropriate UI
+  document.getElementById('public-share-section').style.display = isPrivate ? 'none' : 'block';
+  document.getElementById('private-share-section').style.display = isPrivate ? 'block' : 'none';
+  
+  // Generate public link
+  document.getElementById('roomLink').value = generateRoomLink(room.id);
+}
+
+// Generate room link (public or private)
+function generateRoomLink(roomId, includePassword = false) {
+  const baseUrl = window.location.origin + window.location.pathname;
+  let link = `${baseUrl}?room=${encodeURIComponent(roomId)}`;
+  if (includePassword && roomPassword) {
+    link += `&pwd=${encodeURIComponent(roomPassword)}`;
+  }
+  return link;
+}
+
+// Copy link handler
+function copyLink() {
+  const linkInput = document.getElementById('roomLink');
+  linkInput.select();
   document.execCommand('copy');
   
   // Visual feedback
-  roomLink.classList.add('copied');
-  setTimeout(() => roomLink.classList.remove('copied'), 2000);
+  linkInput.classList.add('copied');
+  setTimeout(() => linkInput.classList.remove('copied'), 2000);
   
-  // Notification
-  showNotification('Link copied to clipboard!');
-});
+  showNotification('Room link copied to clipboard!');
+}
 
-// Share Link Functionality
-document.getElementById('shareBtn').addEventListener('click', () => {
-  const roomLink = document.getElementById('roomLink').value;
+// Share link handler
+function shareLink() {
+  const link = document.getElementById('roomLink').value;
   
   if (navigator.share) {
-    // Mobile share dialog
     navigator.share({
       title: 'Join my study room',
       text: 'Let\'s study together!',
-      url: roomLink
+      url: link
     }).catch(err => {
       console.log('Share failed:', err);
     });
   } else {
-    // Desktop fallback
     window.open(
-      `mailto:?subject=Join my study room&body=Click this link to join: ${roomLink}`,
+      `mailto:?subject=Join my study room&body=Click this link to join: ${link}`,
       '_blank'
     );
   }
-});
+}
+
+// Set password for private rooms
+function setPassword() {
+  roomPassword = document.getElementById('roomPassword').value.trim();
+  if (roomPassword.length < 4) {
+    showNotification('Password must be at least 4 characters');
+    return;
+  }
+  
+  socket.emit('setRoomPassword', {
+    roomId: currentRoom.id,
+    password: roomPassword
+  });
+  
+  // Show private link
+  document.getElementById('privateRoomLink').value = generateRoomLink(currentRoom.id, true);
+  document.getElementById('private-link-container').style.display = 'block';
+}
+
+// Copy private link
+function copyPrivateLink() {
+  const linkInput = document.getElementById('privateRoomLink');
+  linkInput.select();
+  document.execCommand('copy');
+  showNotification('Private room link copied!');
+}
 
 // Auto-join from link
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('room');
-  
+  const password = urlParams.get('pwd');
+
   if (roomId && currentUser) {
-    socket.emit('joinRoom', { roomId });
+    if (password) {
+      // Private room join
+      socket.emit('joinRoom', { roomId, password });
+    } else {
+      // Public room join
+      socket.emit('joinRoom', { roomId });
+    }
   }
 });
 
+// ======================
+// EVENT LISTENER SETUP
+// ======================
 
+// Add these with your other event listeners
+document.getElementById('copyLinkBtn').addEventListener('click', copyLink);
+document.getElementById('shareBtn').addEventListener('click', shareLink);
+document.getElementById('setPasswordBtn').addEventListener('click', setPassword);
+document.getElementById('copyPrivateLinkBtn').addEventListener('click', copyPrivateLink);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  </script>
-</body>
-</html>
+// Room type toggle
+document.getElementById('roomType').addEventListener('change', (e) => {
+  document.getElementById('roomPassword').classList.toggle('hidden', e.target.value !== 'private');
+});
+  }
+  </script></body>
+  </html>
