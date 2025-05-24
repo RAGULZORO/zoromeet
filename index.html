@@ -12,7 +12,7 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
   />
-  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <script src="https://namma-study-room-backend.herokuapp.com/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/simple-peer@9/simplepeer.min.js"></script>
   <style>
     :root {
@@ -104,7 +104,6 @@
       overflow: auto;
     }
 
-    /* Dynamic grid layout based on number of videos */
     #video-grid[data-videos="1"] {
       grid-template-columns: 1fr;
     }
@@ -525,7 +524,10 @@
     <div id="mainContent" class="hidden">
       <div class="header">
         <h1 id="roomTitle">Virtual Study Room</h1>
-        <button id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
+        <div>
+          <button id="inviteBtn"><i class="fas fa-user-plus"></i> Invite</button>
+          <button id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
+        </div>
       </div>
       <div class="main-content">
         <div id="video-section">
@@ -570,6 +572,7 @@
     const sidebar = document.getElementById("sidebar");
     const roomTitle = document.getElementById("roomTitle");
     const backBtn = document.getElementById("backBtn");
+    const inviteBtn = document.getElementById("inviteBtn");
 
     const videoGrid = document.getElementById("video-grid");
     const chatDiv = document.getElementById("chat");
@@ -658,7 +661,1092 @@
         });
     }
 
-    // Join/Create Room
+    // Parse URL Parameters for Auto-Join
+    function getUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        room: params.get("room"),
+        type: params.get("type"),
+        password: params.get("password"),
+      };
+    }
+
+    // Auto-Join Room if URL has Room Details
+  const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+onst urlParams = getUrlParams();
+    iconst urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+f (urlParams.room) {
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ const roomName = urlParams.room;
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ const roomType = urlParams.type || "public";
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ const roomPassword = urlParams.password || "";
+const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ if (!rooms[roomName]) {
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+   rooms[roomName] = {
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+     name: roomName,
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+     type: roomType,
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+     password: roomType === "private" ? roomPassword : null,
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+     users: [],
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+   };
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ } else if (
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+   rooms[roomName].type === "private" &&
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+   rooms[roomName].password !== roomPassword
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ ) {
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+   alert("Incorrect room password");
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+   window.location.href = "index.html";
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+   return;
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ }
+const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ rooms[roomName].users.push(loggedInUser);
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ currentRoom = roomName;
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ roomTitle.textContent = roomName;
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ roomModal.classList.add("hidden");
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ mainContent.classList.remove("hidden");
+     const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+ startVideoConference(roomName);
+    }const urlParams = getUrlParams();
+if (urlParams.room) {
+  const roomName = urlParams.room.trim();
+  const roomType = urlParams.type || "public";
+  const roomPassword = urlParams.password || "";
+
+  if (!rooms[roomName]) {
+    rooms[roomName] = {
+      name: roomName,
+      type: roomType,
+      password: roomType === "private" ? roomPassword : null,
+      users: [],
+    };
+  } else if (
+    rooms[roomName].type === "private" &&
+    rooms[roomName].password !== roomPassword
+  ) {
+    alert("Incorrect room password");
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Ensure loggedInUser is defined
+  if (!loggedInUser) {
+    alert("You must be logged in to join a room.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  rooms[roomName].users.push(loggedInUser);
+  currentRoom = roomName;
+  roomTitle.textContent = roomName;
+  roomModal.classList.add("hidden");
+  mainContent.classList.remove("hidden");
+  startVideoConference(roomName);
+}
+
+
+    // Join/Create Room via Modal
     document.getElementById("joinRoomBtn").addEventListener("click", () => {
       const roomName = document.getElementById("roomName").value.trim();
       const roomType = roomTypeSelect.value;
@@ -699,6 +1787,17 @@
       startVideoConference(roomName);
     });
 
+    // Generate and Copy Invite Link
+    inviteBtn.addEventListener("click", () => {
+      const room = rooms[currentRoom];
+      const inviteLink = `${window.location.origin}/index.html?room=${currentRoom}&type=${room.type}${
+        room.type === "private" ? `&password=${room.password}` : ""
+      }`;
+      navigator.clipboard.writeText(inviteLink).then(() => {
+        alert("Invite link copied to clipboard! Share it with your friend.");
+      });
+    });
+
     // Back Button
     backBtn.addEventListener("click", () => {
       const confirmLeave = confirm("Are you sure you want to leave the room?");
@@ -718,10 +1817,13 @@
       mainContent.classList.add("hidden");
       roomModal.classList.remove("hidden");
       sidebar.classList.add("hidden");
+      window.history.replaceState({}, document.title, "index.html");
     });
 
     // --- WebRTC + Socket.io Setup ---
-    const socket = io();
+    const socket = io("https://zoromeet-backend.onrender.com", {
+   transports: ["websocket"]
+ });
     let localStream;
     const peers = {};
 
@@ -890,6 +1992,7 @@
         mainContent.classList.add("hidden");
         roomModal.classList.remove("hidden");
         sidebar.classList.add("hidden");
+        window.history.replaceState({}, document.title, "index.html");
       });
 
       function updateVideoOverlay(userId, isAudioMuted, isVideoOff) {
