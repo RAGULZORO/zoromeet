@@ -1191,88 +1191,66 @@ function addVideoStream(videoEl, userId, userName) {
       return peer;
       // ======================
 // ROOM SHARING INTEGRATION
-// Room sharing variables at the top level
+// ======================
+
+// Add these at the top with other variables
 let roomPassword = '';
 let currentRoom = null;
 
-// Room joined handler
+// Modified roomJoined handler to include sharing setup
 socket.on('roomJoined', (room) => {
   currentRoom = room;
   setupRoomSharing(room);
   
-  // Handle participants
-  if (room.participants) {
-    room.participants.forEach(participant => {
-      if (participant.id !== socket.id) {
-        createVideoElement(participant.stream, participant.username);
-      }
-    });
-  }
+  // Your existing room joined logic
+  room.participants.forEach(participant => {
+    if (participant.id !== socket.id) {
+      createVideoElement(participant.stream, participant.username);
+    }
+  });
   
+  // Start local video
   startLocalStream();
 });
 
 // Initialize sharing UI
 function setupRoomSharing(room) {
-  if (!room) return; // Early return if no room
+  const isPrivate = room.isPrivate;
   
-  const isPrivate = room.isPrivate || false;
+  // Show appropriate UI
+  document.getElementById('public-share-section').style.display = isPrivate ? 'none' : 'block';
+  document.getElementById('private-share-section').style.display = isPrivate ? 'block' : 'none';
   
-  // Toggle UI based on room type
-  const publicSection = document.getElementById('public-share-section');
-  const privateSection = document.getElementById('private-share-section');
-  
-  if (publicSection && privateSection) {
-    publicSection.style.display = isPrivate ? 'none' : 'block';
-    privateSection.style.display = isPrivate ? 'block' : 'none';
-    
-    const roomLinkInput = document.getElementById('roomLink');
-    if (roomLinkInput) {
-      roomLinkInput.value = generateRoomLink(room.id);
-    }
-  }// ======================Room sharing variables roomPassword = ''; currentRoom = nuRoom joined handlerket.on('roomJoined', (room) => urrentRoom = roometupRoomSharing(room/ Handle participantoom.participants.forEach(participant =>  if (participant.id !== socket.id)    createVideoElement(participant.stream, participant.username) tartLocalStream();Initialize sharing UIction setupRoomSharing(room) onst isPrivate = room.isPrivat/ Toggle UI based on room typocument.getElementById('public-share-section').style.display = isPrivate ? 'none' : 'block'ocument.getElementById('private-share-section').style.display = isPrivate ? 'block' : 'none/ Generate and display linocument.getElementById('roomLink').value = generateRoomLink(room.idGenerate room linkction generateRoomLink(roomId, includePassword = false) onst baseUrl = window.location.origin + window.location.pathnameet link = `${baseUrl}?room=${encodeURIComponent(roomId)}f (includePassword && roomPassword)  link += `&pwd=${encodeURIComponent(roomPassword)}`eturn linCopy link functionalityction copyLink() onst linkInput = document.getElementById('roomLink')inkInput.select()ocument.execCommand('copy'/ Visual feedbacinkInput.classList.add('copied')etTimeout(() => linkInput.classList.remove('copied'), 2000howNotification('Room link copied to clipboard!'Share link functionalityction shareLink() onst link = document.getElementById('roomLink').valuf (navigator.share)  navigator.share(   title: 'Join my study room'   text: 'Let\'s study together!'   url: lin }).catch(console.error) else  window.open   `mailto:?subject=Join my study room&body=Join here: ${link}`   '_blank )Event listeners (should be placed after DOM is loaded)ument.addEventListener('DOMContentLoaded', () => ocument.getElementById('copyLinkBtn').addEventListener('click', copyLink)ocument.getElementById('shareBtn').addEventListener('click', shareLink);
-
+  // Generate public link
+  document.getElementById('roomLink').value = generateRoomLink(room.id);
 }
 
-// Generate room link
+// Generate room link (public or private)
 function generateRoomLink(roomId, includePassword = false) {
-  if (!roomId) return ''; // Early return if no roomId
-  
   const baseUrl = window.location.origin + window.location.pathname;
   let link = `${baseUrl}?room=${encodeURIComponent(roomId)}`;
-  
   if (includePassword && roomPassword) {
     link += `&pwd=${encodeURIComponent(roomPassword)}`;
   }
-  
   return link;
 }
 
-// Copy link functionality
+// Copy link handler
 function copyLink() {
   const linkInput = document.getElementById('roomLink');
-  if (!linkInput) return; // Early return if element doesn't exist
-  
   linkInput.select();
   document.execCommand('copy');
   
   // Visual feedback
   linkInput.classList.add('copied');
-  setTimeout(() => {
-    if (linkInput) {
-      linkInput.classList.remove('copied');
-    }
-  }, 2000);
+  setTimeout(() => linkInput.classList.remove('copied'), 2000);
   
   showNotification('Room link copied to clipboard!');
 }
 
-// Share link functionality
+// Share link handler
 function shareLink() {
-  const linkInput = document.getElementById('roomLink');
-  if (!linkInput || !linkInput.value) return; // Early return if no link
-  
-  const link = linkInput.value;
+  const link = document.getElementById('roomLink').value;
   
   if (navigator.share) {
     navigator.share({
@@ -1280,24 +1258,16 @@ function shareLink() {
       text: 'Let\'s study together!',
       url: link
     }).catch(err => {
-      console.error('Share failed:', err);
+      console.log('Share failed:', err);
     });
   } else {
     window.open(
-      `mailto:?subject=Join my study room&body=Join here: ${encodeURIComponent(link)}`,
+      `mailto:?subject=Join my study room&body=Click this link to join: ${link}`,
       '_blank'
     );
   }
 }
 
-// Initialize event listeners when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  const copyBtn = document.getElementById('copyLinkBtn');
-  const shareBtn = document.getElementById('shareBtn');
-  
-  if (copyBtn) copyBtn.addEventListener('click', copyLink);
-  if (shareBtn) shareBtn.addEventListener('click', shareLink);
-});
 // Set password for private rooms
 function setPassword() {
   roomPassword = document.getElementById('roomPassword').value.trim();
@@ -1355,6 +1325,6 @@ document.getElementById('copyPrivateLinkBtn').addEventListener('click', copyPriv
 document.getElementById('roomType').addEventListener('change', (e) => {
   document.getElementById('roomPassword').classList.toggle('hidden', e.target.value !== 'private');
 });
-  }
+    }
   </script></body>
   </html>
